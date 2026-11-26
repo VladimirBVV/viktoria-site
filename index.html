@@ -281,7 +281,32 @@
     .link-card:hover .link-card__arrow { transform: translateX(3px); }
 
     /* ---------- Картка об'єкта ---------- */
-    .listings { display: grid; gap: 16px; }
+    /* Стрічка об'єктів: гортається вбік, наступна картка трохи визирає */
+    .listings {
+      position: relative;
+      display: flex; gap: 12px;
+      overflow-x: auto; overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+      margin: 0 -20px; padding: 4px 20px 16px;
+      scroll-padding: 0 20px;
+    }
+    .listings::-webkit-scrollbar { display: none; }
+    @media (min-width: 600px) { .listings { margin: 0 -28px; padding: 4px 28px 16px; scroll-padding: 0 28px; } }
+    .listings > .listing { flex: 0 0 88%; scroll-snap-align: start; display: flex; flex-direction: column; }
+    .listings > .listing:only-child { flex-basis: 100%; }
+    .strip-nav { display: flex; justify-content: center; gap: 0; margin-top: -4px; }
+    .strip-nav:empty { display: none; }
+    .strip-nav button {
+      width: 36px; height: 36px; padding: 0; border: 0; background: none; cursor: pointer;
+      display: grid; place-items: center;
+    }
+    .strip-nav button::before {
+      content: ""; width: 8px; height: 8px; border-radius: 999px;
+      background: var(--line); transition: width .25s ease, background-color .25s ease;
+    }
+    .strip-nav button[aria-current="true"]::before { width: 22px; background: var(--green); }
     .listing {
       background: var(--card);
       border: 1px solid var(--line);
@@ -349,7 +374,9 @@
       font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
       color: var(--green);
     }
-    .listing__body { padding: 18px 18px 20px; }
+    .listing__body { padding: 18px 18px 20px; flex: 1; display: flex; flex-direction: column; }
+    .listing__facts { margin: -2px 0 8px; font-size: 14px; font-weight: 600; color: var(--brass); }
+    .listing__actions { margin-top: auto; display: grid; gap: 8px; }
     .listing__title {
       font-family: var(--serif);
       font-weight: 500;
@@ -368,6 +395,52 @@
     }
     .listing__meta span { font-size: 13px; color: var(--ink-soft); }
     .listing__price { font-weight: 700; font-size: 18px; }
+
+    /* ---------- Швидкий запит ---------- */
+    .lead { margin: 0 0 14px; font-size: 15px; color: var(--ink-soft); }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      display: inline-flex; align-items: center;
+      min-height: 48px; padding: 10px 18px;
+      border-radius: 999px;
+      background: var(--card); border: 1px solid var(--line);
+      font-weight: 600; font-size: 15px; text-decoration: none;
+      box-shadow: var(--shadow);
+      transition: transform .2s ease, border-color .2s ease, background-color .2s ease, color .2s ease;
+    }
+    .chip:hover { border-color: var(--green); background: var(--green); color: #fff; transform: translateY(-1px); }
+
+    /* ---------- Як я працюю ---------- */
+    .steps { list-style: none; margin: 0; padding: 0; position: relative; }
+    .steps::before {
+      content: ""; position: absolute; left: 21px; top: 22px; bottom: 22px;
+      border-left: 1px dashed var(--brass-soft);
+    }
+    .step { position: relative; display: grid; grid-template-columns: 44px 1fr; gap: 14px; padding: 8px 0; }
+    .step__num {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: grid; place-items: center;
+      background: var(--paper); border: 1px solid var(--brass-soft);
+      font-family: var(--serif); font-size: 20px; color: var(--brass);
+      position: relative;
+    }
+    .step h3 { margin: 4px 0 2px; font-size: 16px; font-weight: 700; }
+    .step p { margin: 0; font-size: 15px; color: var(--ink-soft); }
+
+    /* ---------- Про мене ---------- */
+    .about {
+      padding: 20px; border-radius: var(--radius);
+      background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow);
+    }
+    .about__head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+    .about__photo { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid var(--brass-soft); }
+    .about__name { margin: 0; font-family: var(--serif); font-size: 20px; }
+    .about__role { margin: 2px 0 0; font-size: 14px; color: var(--ink-soft); }
+    .about__role a { color: var(--green); font-weight: 700; letter-spacing: .06em; }
+    .about__text {
+      margin: 0; font-family: var(--serif); font-style: italic; font-size: 17px; line-height: 1.55;
+      padding-left: 14px; border-left: 2px solid var(--brass-soft);
+    }
 
     /* ---------- Послуги ---------- */
     .services { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; }
@@ -409,6 +482,51 @@
     .cta p { margin: 0 0 20px; color: #d9cfbe; font-size: 15px; }
     .cta .btn--primary { background: #e9dcc4; color: var(--green-deep); box-shadow: none; }
     .cta .btn--primary:hover { background: #fff; }
+    /* М'яка «пульсація» кнопки дзвінка, коли людина дочитала до кінця */
+    .cta .btn--primary { position: relative; }
+    .cta .btn--primary.is-pulsing::after {
+      content: ""; position: absolute; inset: 0; border-radius: inherit;
+      box-shadow: 0 0 0 0 rgba(233,220,196,.7);
+      animation: cta-pulse 3s ease-out infinite;
+      pointer-events: none;
+    }
+    @keyframes cta-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(233,220,196,.7); }
+      40%, 100% { box-shadow: 0 0 0 14px rgba(233,220,196,0); }
+    }
+
+    /* ---------- Шторка з повідомленням ---------- */
+    .sheet {
+      width: min(480px, 100%); max-width: 100%;
+      margin: auto auto 0; padding: 0;
+      border: 0; border-radius: 24px 24px 0 0;
+      background: var(--paper); color: var(--ink);
+      box-shadow: 0 -20px 60px -20px rgba(0,0,0,.45);
+    }
+    @media (min-width: 600px) { .sheet { margin: auto; border-radius: 24px; } }
+    .sheet::backdrop { background: rgba(20,30,28,.55); }
+    .sheet[open] { animation: sheet-in .28s cubic-bezier(.2,.8,.2,1); }
+    @keyframes sheet-in { from { transform: translateY(40px); opacity: 0; } }
+    .sheet__inner { position: relative; padding: 24px 20px max(20px, env(safe-area-inset-bottom)); }
+    .sheet__close {
+      position: absolute; top: 10px; right: 10px;
+      width: 48px; height: 48px; border: 0; border-radius: 50%;
+      background: transparent; color: var(--ink-soft); cursor: pointer;
+      display: grid; place-items: center;
+    }
+    .sheet__close svg { width: 20px; height: 20px; }
+    .sheet__title { margin: 0 48px 6px 0; font-family: var(--serif); font-weight: 500; font-size: 24px; }
+    .sheet__hint { margin: 0 0 12px; font-size: 14px; color: var(--ink-soft); }
+    .sheet__msg {
+      margin: 0 0 16px; padding: 14px 16px;
+      background: var(--card); border: 1px solid var(--line); border-radius: 16px 16px 16px 4px;
+      font-size: 15px;
+    }
+    .sheet__options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .sheet__call {
+      display: block; margin-top: 14px; padding: 12px 0 4px;
+      text-align: center; font-size: 14px; color: var(--ink-soft); text-decoration: none;
+    }
     .cta__phone { display: block; margin-top: 12px; font-size: 14px; color: #d9cfbe; letter-spacing: .03em; }
 
     footer {
@@ -435,6 +553,7 @@
     .no-js .reveal { opacity: 1; transform: none; }
 
     @media (prefers-reduced-motion: reduce) {
+      .cta .btn--primary.is-pulsing::after { display: none; }
       *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
       .reveal { opacity: 1; transform: none; }
     }
@@ -444,6 +563,23 @@
       clip: rect(0 0 0 0); white-space: nowrap;
     }
   </style>
+
+  <!-- ============ АНАЛІТИКА (Google Analytics 4) ============
+       TODO: вставте свій Measurement ID (вигляд G-XXXXXXXXXX) у GA_ID нижче.
+       Поки поле порожнє, нічого не завантажується і нічого не збирається.
+       Події, які рахуються: call, telegram, viber, viewing_request, quick_request,
+       listing_link, outbound (інші посилання), listing_view (об'єкт показався на екрані). -->
+  <script>
+    window.GA_ID = '';
+    if (window.GA_ID) {
+      var s = document.createElement('script');
+      s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + window.GA_ID;
+      document.head.appendChild(s);
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function () { dataLayer.push(arguments); };
+      gtag('js', new Date()); gtag('config', window.GA_ID);
+    }
+  </script>
 </head>
 <body class="no-js">
 
@@ -493,6 +629,12 @@
       </symbol>
       <symbol id="i-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="m6 9 6 6 6-6"/>
+      </symbol>
+      <symbol id="i-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>
+      </symbol>
+      <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M6 6l12 12M18 6 6 18"/>
       </symbol>
       <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>
@@ -622,21 +764,21 @@
       </ul>
     </section>
 
-    <!-- ============ 5. АКТУАЛЬНІ ОБ'ЄКТИ ============ -->
+    <!-- ============ 5. АКТУАЛЬНІ ОБ'ЄКТИ (стрічка, гортається вбік) ============ -->
     <section aria-labelledby="listings-title" class="reveal">
-      <h2 class="section-title" id="listings-title">Актуальний об'єкт</h2>
+      <h2 class="section-title" id="listings-title">Актуальні об'єкти</h2>
 
-      <div class="listings">
-        <!--
-          ↓↓↓ ШАБЛОН КАРТКИ ОБ'ЄКТА ↓↓↓
-          Щоб додати новий об'єкт: скопіюйте весь блок <article class="listing"> … </article>
-          і змініть: фото (теги <img> у слайдері), позначку, назву, адресу, ціну та посилання кнопки.
-          Фото кладіть в окрему папку, напр. img/nazva-obyekta/01.jpg (горизонтальні, 4:3).
-        -->
-        <article class="listing">
-          <!-- Слайдер фото: додайте/приберіть <img> у .slider__track — лічильник і кнопки налаштуються самі -->
+      <!--
+        ↓↓↓ Щоб додати об'єкт: скопіюйте будь-який блок <article class="listing"> … </article> ↓↓↓
+        і змініть: фото (теги <img>), позначку, назву, коротко про об'єкт, адресу, ціну,
+        посилання «Дивитись» і текст повідомлення в data-ask / ?text= кнопки «Хочу на перегляд».
+        Фото — в окрему папку, напр. img/nazva-obyekta/01.jpg (горизонтальні, 4:3).
+        Крапки-перемикачі під стрічкою з'являться самі.
+      -->
+      <div class="listings" data-strip>
+        <article class="listing" data-track-view="Квартира 70 м² з видом на Дніпро, ЖК Парк Стоун">
           <div class="listing__media slider" data-slider>
-            <div class="slider__track" tabindex="0" role="group" aria-roledescription="слайдер" aria-label="Фото квартири">
+            <div class="slider__track" tabindex="0" role="group" aria-roledescription="слайдер" aria-label="Фото: Квартира в ЖК Парк Стоун">
               <img src="img/park-stoun/01.jpg" alt="Квартира в ЖК Парк Стоун, фото 1" width="960" height="720">
               <img src="img/park-stoun/02.jpg" alt="Квартира в ЖК Парк Стоун, фото 2" width="960" height="720" loading="lazy">
               <img src="img/park-stoun/03.jpg" alt="Квартира в ЖК Парк Стоун, фото 3" width="960" height="720" loading="lazy">
@@ -653,6 +795,7 @@
           </div>
           <div class="listing__body">
             <h3 class="listing__title">Квартира 70 м² з видом на Дніпро, ЖК Парк Стоун</h3>
+            <p class="listing__facts">70 м² · вид на Дніпро</p>
             <p class="listing__addr">
               <svg aria-hidden="true"><use href="#i-pin"/></svg>
               Оболонь, вул. Володимира Васюка, 2-Д
@@ -661,13 +804,116 @@
               <span>Ціна</span>
               <strong class="listing__price">138&nbsp;000&nbsp;$</strong>
             </div>
-            <a class="btn btn--primary" href="https://www.olx.ua/d/uk/obyavlenie/vidova-na-dnpro-2-km-kvartira-70m2-zhk-park-stoun-obolon-vul-volodimira-vasyuka-2-d-ID11DEby.html" target="_blank" rel="noopener">
-              Дивитись
-              <svg aria-hidden="true"><use href="#i-arrow"/></svg>
-            </a>
+            <div class="listing__actions">
+              <a class="btn btn--primary" href="https://t.me/Victoria_PN?text=%D0%94%D0%BE%D0%B1%D1%80%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BD%D1%8C%2C%20%D0%92%D1%96%D0%BA%D1%82%D0%BE%D1%80%D1%96%D1%94%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BF%D0%BE%D0%B4%D0%B8%D0%B2%D0%B8%D1%82%D0%B8%D1%81%D1%8C%20%D0%BA%D0%B2%D0%B0%D1%80%D1%82%D0%B8%D1%80%D1%83%2070%20%D0%BC%C2%B2%20%D1%83%20%D0%96%D0%9A%20%D0%9F%D0%B0%D1%80%D0%BA%20%D0%A1%D1%82%D0%BE%D1%83%D0%BD%20%28%D0%9E%D0%B1%D0%BE%D0%BB%D0%BE%D0%BD%D1%8C%2C%20%D0%B2%D1%83%D0%BB.%20%D0%92%D0%BE%D0%BB%D0%BE%D0%B4%D0%B8%D0%BC%D0%B8%D1%80%D0%B0%20%D0%92%D0%B0%D1%81%D1%8E%D0%BA%D0%B0%2C%202-%D0%94%29.%20%D0%9A%D0%BE%D0%BB%D0%B8%20%D0%BC%D0%BE%D0%B6%D0%BD%D0%B0%20%D0%B4%D0%BE%D0%BC%D0%BE%D0%B2%D0%B8%D1%82%D0%B8%D1%81%D1%8C%20%D0%BF%D1%80%D0%BE%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B3%D0%BB%D1%8F%D0%B4%3F" target="_blank" rel="noopener"
+                 data-ask="Добрий день, Вікторіє! Хочу подивитись квартиру 70 м² у ЖК Парк Стоун (Оболонь, вул. Володимира Васюка, 2-Д). Коли можна домовитись про перегляд?" data-track="viewing_request">
+                <svg aria-hidden="true"><use href="#i-eye"/></svg>
+                Хочу на перегляд
+              </a>
+              <a class="btn btn--ghost" href="https://www.olx.ua/d/uk/obyavlenie/vidova-na-dnpro-2-km-kvartira-70m2-zhk-park-stoun-obolon-vul-volodimira-vasyuka-2-d-ID11DEby.html" target="_blank" rel="noopener" data-track="listing_link">
+                Дивитись
+                <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+              </a>
+            </div>
           </div>
         </article>
-        <!-- ↑↑↑ КІНЕЦЬ ШАБЛОНУ КАРТКИ ↑↑↑ -->
+        <article class="listing" data-track-view="Будинок 163 м² біля хвойного лісу, КМ PROцвіт Village">
+          <div class="listing__media slider" data-slider>
+            <div class="slider__track" tabindex="0" role="group" aria-roledescription="слайдер" aria-label="Фото: Будинок у КМ PROцвіт Village">
+              <img src="img/protsiv/01.jpg" alt="Будинок у КМ PROцвіт Village, фото 1" width="960" height="720" loading="lazy">
+              <img src="img/protsiv/02.jpg" alt="Будинок у КМ PROцвіт Village, фото 2" width="960" height="720" loading="lazy">
+              <img src="img/protsiv/03.jpg" alt="Будинок у КМ PROцвіт Village, фото 3" width="960" height="720" loading="lazy">
+              <img src="img/protsiv/04.jpg" alt="Будинок у КМ PROцвіт Village, фото 4" width="960" height="720" loading="lazy">
+              <img src="img/protsiv/05.jpg" alt="Будинок у КМ PROцвіт Village, фото 5" width="960" height="720" loading="lazy">
+              <img src="img/protsiv/06.jpg" alt="Будинок у КМ PROцвіт Village, фото 6" width="960" height="720" loading="lazy">
+              <img src="img/protsiv/07.jpg" alt="Будинок у КМ PROцвіт Village, фото 7" width="960" height="720" loading="lazy">
+            </div>
+            <button class="slider__btn slider__btn--prev" type="button" aria-label="Попереднє фото"><svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+            <button class="slider__btn slider__btn--next" type="button" aria-label="Наступне фото"><svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+            <span class="slider__count" aria-live="polite"></span>
+            <span class="slider__progress" aria-hidden="true"></span>
+            <span class="listing__badge">Продаж</span>
+          </div>
+          <div class="listing__body">
+            <h3 class="listing__title">Будинок 163 м² біля хвойного лісу, КМ PROцвіт Village</h3>
+            <p class="listing__facts">163 м² · 4 спальні · 2 поверхи · ділянка 10 соток</p>
+            <p class="listing__addr">
+              <svg aria-hidden="true"><use href="#i-pin"/></svg>
+              с. Проців, вул. Травнева (Бориспільський р-н)
+            </p>
+            <div class="listing__meta">
+              <span>Ціна</span>
+              <strong class="listing__price">244&nbsp;500&nbsp;$</strong>
+            </div>
+            <div class="listing__actions">
+              <a class="btn btn--primary" href="https://t.me/Victoria_PN?text=%D0%94%D0%BE%D0%B1%D1%80%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BD%D1%8C%2C%20%D0%92%D1%96%D0%BA%D1%82%D0%BE%D1%80%D1%96%D1%94%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BF%D0%BE%D0%B4%D0%B8%D0%B2%D0%B8%D1%82%D0%B8%D1%81%D1%8C%20%D0%B1%D1%83%D0%B4%D0%B8%D0%BD%D0%BE%D0%BA%20163%20%D0%BC%C2%B2%20%D1%83%20%D0%9A%D0%9C%20PRO%D1%86%D0%B2%D1%96%D1%82%20Village%20%28%D1%81.%20%D0%9F%D1%80%D0%BE%D1%86%D1%96%D0%B2%29.%20%D0%9A%D0%BE%D0%BB%D0%B8%20%D0%BC%D0%BE%D0%B6%D0%BD%D0%B0%20%D0%B4%D0%BE%D0%BC%D0%BE%D0%B2%D0%B8%D1%82%D0%B8%D1%81%D1%8C%20%D0%BF%D1%80%D0%BE%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B3%D0%BB%D1%8F%D0%B4%3F" target="_blank" rel="noopener"
+                 data-ask="Добрий день, Вікторіє! Хочу подивитись будинок 163 м² у КМ PROцвіт Village (с. Проців). Коли можна домовитись про перегляд?" data-track="viewing_request">
+                <svg aria-hidden="true"><use href="#i-eye"/></svg>
+                Хочу на перегляд
+              </a>
+              <a class="btn btn--ghost" href="https://rieltor.ua/protsev/houses-sale/view/13211881/" target="_blank" rel="noopener" data-track="listing_link">
+                Дивитись
+                <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+              </a>
+            </div>
+          </div>
+        </article>
+        <article class="listing" data-track-view="Будинок 670 м² з басейном і виходом до озера">
+          <div class="listing__media slider" data-slider>
+            <div class="slider__track" tabindex="0" role="group" aria-roledescription="слайдер" aria-label="Фото: Будинок у с. Підгірці">
+              <img src="img/pidhirtsi/01.jpg" alt="Будинок у с. Підгірці, фото 1" width="960" height="720" loading="lazy">
+              <img src="img/pidhirtsi/02.jpg" alt="Будинок у с. Підгірці, фото 2" width="960" height="720" loading="lazy">
+              <img src="img/pidhirtsi/03.jpg" alt="Будинок у с. Підгірці, фото 3" width="960" height="720" loading="lazy">
+              <img src="img/pidhirtsi/04.jpg" alt="Будинок у с. Підгірці, фото 4" width="960" height="720" loading="lazy">
+              <img src="img/pidhirtsi/05.jpg" alt="Будинок у с. Підгірці, фото 5" width="960" height="720" loading="lazy">
+              <img src="img/pidhirtsi/06.jpg" alt="Будинок у с. Підгірці, фото 6" width="960" height="720" loading="lazy">
+              <img src="img/pidhirtsi/07.jpg" alt="Будинок у с. Підгірці, фото 7" width="960" height="720" loading="lazy">
+            </div>
+            <button class="slider__btn slider__btn--prev" type="button" aria-label="Попереднє фото"><svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+            <button class="slider__btn slider__btn--next" type="button" aria-label="Наступне фото"><svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+            <span class="slider__count" aria-live="polite"></span>
+            <span class="slider__progress" aria-hidden="true"></span>
+            <span class="listing__badge">Продаж</span>
+          </div>
+          <div class="listing__body">
+            <h3 class="listing__title">Будинок 670 м² з басейном і виходом до озера</h3>
+            <p class="listing__facts">670 м² · 2 поверхи · ділянка 25 соток · басейн</p>
+            <p class="listing__addr">
+              <svg aria-hidden="true"><use href="#i-pin"/></svg>
+              с. Підгірці, вул. Київська
+            </p>
+            <div class="listing__meta">
+              <span>Ціна</span>
+              <strong class="listing__price">799&nbsp;000&nbsp;$</strong>
+            </div>
+            <div class="listing__actions">
+              <a class="btn btn--primary" href="https://t.me/Victoria_PN?text=%D0%94%D0%BE%D0%B1%D1%80%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BD%D1%8C%2C%20%D0%92%D1%96%D0%BA%D1%82%D0%BE%D1%80%D1%96%D1%94%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BF%D0%BE%D0%B4%D0%B8%D0%B2%D0%B8%D1%82%D0%B8%D1%81%D1%8C%20%D0%B1%D1%83%D0%B4%D0%B8%D0%BD%D0%BE%D0%BA%20670%20%D0%BC%C2%B2%20%D0%B7%20%D0%B1%D0%B0%D1%81%D0%B5%D0%B9%D0%BD%D0%BE%D0%BC%20%D1%83%20%D1%81.%20%D0%9F%D1%96%D0%B4%D0%B3%D1%96%D1%80%D1%86%D1%96.%20%D0%9A%D0%BE%D0%BB%D0%B8%20%D0%BC%D0%BE%D0%B6%D0%BD%D0%B0%20%D0%B4%D0%BE%D0%BC%D0%BE%D0%B2%D0%B8%D1%82%D0%B8%D1%81%D1%8C%20%D0%BF%D1%80%D0%BE%20%D0%BF%D0%B5%D1%80%D0%B5%D0%B3%D0%BB%D1%8F%D0%B4%3F" target="_blank" rel="noopener"
+                 data-ask="Добрий день, Вікторіє! Хочу подивитись будинок 670 м² з басейном у с. Підгірці. Коли можна домовитись про перегляд?" data-track="viewing_request">
+                <svg aria-hidden="true"><use href="#i-eye"/></svg>
+                Хочу на перегляд
+              </a>
+              <a class="btn btn--ghost" href="https://rieltor.ua/podgortsy/houses-sale/view/13211841/" target="_blank" rel="noopener" data-track="listing_link">
+                Дивитись
+                <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+              </a>
+            </div>
+          </div>
+        </article>
+      </div>
+      <div class="strip-nav" data-strip-nav aria-label="Перемикання об'єктів"></div>
+    </section>
+
+    <!-- ============ ШВИДКИЙ ЗАПИТ ============ -->
+    <section aria-labelledby="ask-title" class="reveal">
+      <h2 class="section-title" id="ask-title">Що шукаєте?</h2>
+      <p class="lead">Оберіть варіант — повідомлення для мене вже буде готове, лишиться тільки надіслати.</p>
+      <div class="chips">
+        <a class="chip" href="https://t.me/Victoria_PN?text=%D0%94%D0%BE%D0%B1%D1%80%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BD%D1%8C%2C%20%D0%92%D1%96%D0%BA%D1%82%D0%BE%D1%80%D1%96%D1%94%21%20%D0%A8%D1%83%D0%BA%D0%B0%D1%8E%20%D0%BA%D0%B2%D0%B0%D1%80%D1%82%D0%B8%D1%80%D1%83%20%D0%B2%20%D0%9A%D0%B8%D1%94%D0%B2%D1%96.%20%D0%94%D0%BE%D0%BF%D0%BE%D0%BC%D0%BE%D0%B6%D0%B5%D1%82%D0%B5%20%D0%B7%20%D0%BF%D1%96%D0%B4%D0%B1%D0%BE%D1%80%D0%BE%D0%BC%3F" target="_blank" rel="noopener" data-ask="Добрий день, Вікторіє! Шукаю квартиру в Києві. Допоможете з підбором?" data-track="quick_request">Квартира в Києві</a>
+        <a class="chip" href="https://t.me/Victoria_PN?text=%D0%94%D0%BE%D0%B1%D1%80%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BD%D1%8C%2C%20%D0%92%D1%96%D0%BA%D1%82%D0%BE%D1%80%D1%96%D1%94%21%20%D0%A8%D1%83%D0%BA%D0%B0%D1%8E%20%D0%B1%D1%83%D0%B4%D0%B8%D0%BD%D0%BE%D0%BA%20%D0%BF%D1%96%D0%B4%20%D0%9A%D0%B8%D1%94%D0%B2%D0%BE%D0%BC.%20%D0%94%D0%BE%D0%BF%D0%BE%D0%BC%D0%BE%D0%B6%D0%B5%D1%82%D0%B5%20%D0%B7%20%D0%BF%D1%96%D0%B4%D0%B1%D0%BE%D1%80%D0%BE%D0%BC%3F" target="_blank" rel="noopener" data-ask="Добрий день, Вікторіє! Шукаю будинок під Києвом. Допоможете з підбором?" data-track="quick_request">Будинок під Києвом</a>
+        <a class="chip" href="https://t.me/Victoria_PN?text=%D0%94%D0%BE%D0%B1%D1%80%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BD%D1%8C%2C%20%D0%92%D1%96%D0%BA%D1%82%D0%BE%D1%80%D1%96%D1%94%21%20%D0%A6%D1%96%D0%BA%D0%B0%D0%B2%D0%BB%D1%8F%D1%82%D1%8C%20%D0%BA%D0%B2%D0%B0%D1%80%D1%82%D0%B8%D1%80%D0%B8%20%D0%B2%20%D0%BD%D0%BE%D0%B2%D0%BE%D0%B1%D1%83%D0%B4%D0%BE%D0%B2%D0%B0%D1%85.%20%D0%94%D0%BE%D0%BF%D0%BE%D0%BC%D0%BE%D0%B6%D0%B5%D1%82%D0%B5%20%D0%B7%20%D0%BF%D1%96%D0%B4%D0%B1%D0%BE%D1%80%D0%BE%D0%BC%3F" target="_blank" rel="noopener" data-ask="Добрий день, Вікторіє! Цікавлять квартири в новобудовах. Допоможете з підбором?" data-track="quick_request">Новобудова</a>
+        <a class="chip" href="https://t.me/Victoria_PN?text=%D0%94%D0%BE%D0%B1%D1%80%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BD%D1%8C%2C%20%D0%92%D1%96%D0%BA%D1%82%D0%BE%D1%80%D1%96%D1%94%21%20%D0%A8%D1%83%D0%BA%D0%B0%D1%8E%20%D0%B6%D0%B8%D1%82%D0%BB%D0%BE%20%D0%B2%20%D0%BE%D1%80%D0%B5%D0%BD%D0%B4%D1%83.%20%D0%94%D0%BE%D0%BF%D0%BE%D0%BC%D0%BE%D0%B6%D0%B5%D1%82%D0%B5%3F" target="_blank" rel="noopener" data-ask="Добрий день, Вікторіє! Шукаю житло в оренду. Допоможете?" data-track="quick_request">Оренда</a>
+        <a class="chip" href="https://t.me/Victoria_PN?text=%D0%94%D0%BE%D0%B1%D1%80%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BD%D1%8C%2C%20%D0%92%D1%96%D0%BA%D1%82%D0%BE%D1%80%D1%96%D1%94%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BF%D1%80%D0%BE%D0%B4%D0%B0%D1%82%D0%B8%20%D1%81%D0%B2%D0%BE%D1%8E%20%D0%BD%D0%B5%D1%80%D1%83%D1%85%D0%BE%D0%BC%D1%96%D1%81%D1%82%D1%8C.%20%D0%9C%D0%BE%D0%B6%D0%B5%D0%BC%D0%BE%20%D0%BE%D0%B1%D0%B3%D0%BE%D0%B2%D0%BE%D1%80%D0%B8%D1%82%D0%B8%3F" target="_blank" rel="noopener" data-ask="Добрий день, Вікторіє! Хочу продати свою нерухомість. Можемо обговорити?" data-track="quick_request">Хочу продати житло</a>
+        <a class="chip" href="https://t.me/Victoria_PN?text=%D0%94%D0%BE%D0%B1%D1%80%D0%B8%D0%B9%20%D0%B4%D0%B5%D0%BD%D1%8C%2C%20%D0%92%D1%96%D0%BA%D1%82%D0%BE%D1%80%D1%96%D1%94%21%20%D0%9C%D0%B0%D1%8E%20%D0%B7%D0%B0%D0%BF%D0%B8%D1%82%D0%B0%D0%BD%D0%BD%D1%8F%20%D1%89%D0%BE%D0%B4%D0%BE%20%D0%BD%D0%B5%D1%80%D1%83%D1%85%D0%BE%D0%BC%D0%BE%D1%81%D1%82%D1%96%3A%20" target="_blank" rel="noopener" data-ask="Добрий день, Вікторіє! Маю запитання щодо нерухомості: " data-track="quick_request">Інше питання</a>
       </div>
     </section>
 
@@ -699,6 +945,46 @@
       </ul>
     </section>
 
+    <!-- ============ ЯК Я ПРАЦЮЮ ============ -->
+    <!-- TODO: за потреби відредагуйте назви й описи кроків -->
+    <section aria-labelledby="steps-title" class="reveal">
+      <h2 class="section-title" id="steps-title">Як я працюю</h2>
+      <ol class="steps">
+        <li class="step">
+          <span class="step__num" aria-hidden="true">1</span>
+          <div><h3>Знайомство</h3><p>Дзвінок або повідомлення: обговорюємо ваш запит, бюджет і терміни.</p></div>
+        </li>
+        <li class="step">
+          <span class="step__num" aria-hidden="true">2</span>
+          <div><h3>Підбір</h3><p>Відбираю варіанти, що відповідають запиту, і надсилаю їх вам.</p></div>
+        </li>
+        <li class="step">
+          <span class="step__num" aria-hidden="true">3</span>
+          <div><h3>Перегляди</h3><p>Домовляюсь про покази в зручний для вас час і супроводжую на місці.</p></div>
+        </li>
+        <li class="step">
+          <span class="step__num" aria-hidden="true">4</span>
+          <div><h3>Угода</h3><p>Допомагаю з домовленостями та супроводжую до підписання документів і передачі ключів.</p></div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ============ ПРО МЕНЕ ============ -->
+    <section aria-labelledby="about-title" class="reveal">
+      <h2 class="section-title" id="about-title">Про мене</h2>
+      <div class="about">
+        <div class="about__head">
+          <img class="about__photo" src="photo.jpg" alt="" width="64" height="64" loading="lazy" onerror="this.remove()">
+          <div>
+            <p class="about__name">Вікторія Боярчук</p>
+            <p class="about__role">Спеціаліст з продажу квартир · <a href="https://primes.rieltor.ua/" target="_blank" rel="noopener">PRIMES</a></p>
+          </div>
+        </div>
+        <!-- TODO: замініть цей текст на 2–3 речення від Вікторії власними словами -->
+        <p class="about__text">Мене звати Вікторія, я ріелтор у Києві й працюю в компанії PRIMES. Допомагаю купувати, продавати та орендувати житло. Для мене важливо, щоб на кожному кроці вам було зрозуміло, що відбувається і навіщо.</p>
+      </div>
+    </section>
+
     <!-- ============ 7. ФІНАЛЬНИЙ ЗАКЛИК ============ -->
     <section class="cta reveal" aria-labelledby="cta-title" id="bottom-cta">
       <h2 id="cta-title">Маєте запитання щодо нерухомості?</h2>
@@ -713,6 +999,27 @@
     <footer>© 2026 Вікторія Боярчук · Київ</footer>
   </main>
 
+  <!-- Шторка з готовим повідомленням: відкривається кнопками «Хочу на перегляд» і швидкими запитами -->
+  <dialog class="sheet" id="ask-sheet" aria-labelledby="sheet-title">
+    <form method="dialog" class="sheet__inner">
+      <button class="sheet__close" value="close" aria-label="Закрити">
+        <svg aria-hidden="true"><use href="#i-close"/></svg>
+      </button>
+      <h2 class="sheet__title" id="sheet-title">Написати Вікторії</h2>
+      <p class="sheet__hint">Повідомлення вже готове — оберіть месенджер і надішліть:</p>
+      <p class="sheet__msg" id="sheet-msg"></p>
+      <div class="sheet__options">
+        <a class="btn btn--primary" id="sheet-tg" href="https://t.me/Victoria_PN" target="_blank" rel="noopener">
+          <svg aria-hidden="true"><use href="#i-telegram"/></svg> Telegram
+        </a>
+        <a class="btn btn--ghost" id="sheet-viber" href="viber://chat?number=%2B380955425848">
+          <svg aria-hidden="true"><use href="#i-viber"/></svg> Viber
+        </a>
+      </div>
+      <a class="sheet__call" href="tel:+380955425848">або зателефонуйте: <strong>+380 95 542 58 48</strong></a>
+    </form>
+  </dialog>
+
   <!-- Плаваюча кнопка дзвінка: з'являється, коли верхня й нижня кнопки поза екраном -->
   <div class="sticky-call" id="sticky-call" aria-hidden="true">
     <a class="btn btn--primary" href="tel:+380955425848" tabindex="-1">
@@ -722,6 +1029,72 @@
   </div>
 
   <script>
+    // Аналітика: безпечна обгортка (працює, лише якщо GA_ID заповнено)
+    function track(name, params) {
+      try { if (window.gtag) gtag('event', name, params || {}); } catch (e) {}
+    }
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest('a');
+      if (!a) return;
+      if (a.hasAttribute('data-ask') && window.HTMLDialogElement) return; // рахує шторка нижче
+      var href = a.getAttribute('href') || '';
+      var label = (a.dataset.ask || a.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 100);
+      if (a.dataset.track) track(a.dataset.track, { label: label, url: a.href });
+      else if (href.indexOf('tel:') === 0) track('call', { label: label });
+      else if (href.indexOf('t.me/') > -1) track('telegram', { label: label });
+      else if (href.indexOf('viber:') === 0) track('viber', { label: label });
+      else if (a.target === '_blank') track('outbound', { label: label, url: a.href });
+    });
+
+    // Шторка з готовим повідомленням (Telegram / Viber)
+    (function () {
+      var sheet = document.getElementById('ask-sheet');
+      if (!sheet || typeof sheet.showModal !== 'function') return; // старі браузери — просто відкриється Telegram
+      var msg = document.getElementById('sheet-msg');
+      var tg = document.getElementById('sheet-tg');
+      var viber = document.getElementById('sheet-viber');
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest('[data-ask]');
+        if (!a) return;
+        e.preventDefault();
+        var text = a.dataset.ask;
+        if (a.dataset.track) track(a.dataset.track, { label: text.slice(0, 100) });
+        msg.textContent = text;
+        tg.href = 'https://t.me/Victoria_PN?text=' + encodeURIComponent(text);
+        viber.href = 'viber://chat?number=%2B380955425848&draft=' + encodeURIComponent(text);
+        sheet.showModal();
+      }, true);
+      // Закриття по тапу на затемнений фон
+      sheet.addEventListener('click', function (e) { if (e.target === sheet) sheet.close(); });
+      [tg, viber].forEach(function (el) { el.addEventListener('click', function () { setTimeout(function () { sheet.close(); }, 300); }); });
+    })();
+
+    // Стрічка об'єктів: крапки-перемикачі
+    document.querySelectorAll('[data-strip]').forEach(function (strip) {
+      var cards = Array.prototype.slice.call(strip.querySelectorAll(':scope > .listing'));
+      var nav = strip.parentNode.querySelector('[data-strip-nav]');
+      if (!nav || cards.length < 2) return;
+      var pad = function () { return parseFloat(getComputedStyle(strip).paddingLeft) || 0; };
+      var dots = cards.map(function (card, i) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.setAttribute('aria-label', "Об'єкт " + (i + 1) + ' з ' + cards.length);
+        b.addEventListener('click', function () { strip.scrollTo({ left: card.offsetLeft - pad(), behavior: 'smooth' }); });
+        nav.appendChild(b);
+        return b;
+      });
+      var render = function () {
+        var x = strip.scrollLeft + pad(), best = 0, bestD = Infinity;
+        cards.forEach(function (c, i) { var d = Math.abs(c.offsetLeft - x); if (d < bestD) { bestD = d; best = i; } });
+        // у кінці стрічки — остання картка
+        if (strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 4) best = cards.length - 1;
+        dots.forEach(function (d, i) { d.setAttribute('aria-current', i === best ? 'true' : 'false'); });
+      };
+      var raf;
+      strip.addEventListener('scroll', function () { cancelAnimationFrame(raf); raf = requestAnimationFrame(render); }, { passive: true });
+      render();
+    });
+
     // Слайдери фото об'єктів
     document.querySelectorAll('[data-slider]').forEach(function (root) {
       var track = root.querySelector('.slider__track');
@@ -835,6 +1208,20 @@
       });
       ctaObs.observe(document.getElementById('top-actions'));
       ctaObs.observe(document.getElementById('bottom-cta'));
+
+      // Пульсація кнопки дзвінка внизу, поки фінальний блок на екрані
+      var ctaBtn = document.querySelector('#bottom-cta .btn--primary');
+      new IntersectionObserver(function (entries) {
+        ctaBtn.classList.toggle('is-pulsing', entries[0].isIntersecting);
+      }, { threshold: 0.6 }).observe(document.getElementById('bottom-cta'));
+
+      // Аналітика: який об'єкт людина реально побачила
+      var seen = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { track('listing_view', { label: e.target.dataset.trackView }); seen.unobserve(e.target); }
+        });
+      }, { threshold: 0.4 });
+      document.querySelectorAll('[data-track-view]').forEach(function (el) { seen.observe(el); });
     })();
   </script>
 </body>

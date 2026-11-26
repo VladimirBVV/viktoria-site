@@ -333,6 +333,15 @@
       font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums;
     }
     .slider__count:empty, .no-js .slider__btn { display: none; }
+    /* Тонка смужка-таймер до наступного фото */
+    .slider__progress {
+      position: absolute; left: 0; bottom: 0; height: 3px; width: 100%;
+      background: var(--brass-soft);
+      transform: scaleX(0); transform-origin: left;
+      pointer-events: none;
+    }
+    .slider__progress.is-running { animation: slider-progress linear forwards; }
+    @keyframes slider-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
     .listing__badge {
       position: absolute; top: 12px; left: 12px;
       padding: 6px 12px; border-radius: 999px;
@@ -635,27 +644,11 @@
               <img src="img/park-stoun/05.jpg" alt="Квартира в ЖК Парк Стоун, фото 5" width="960" height="720" loading="lazy">
               <img src="img/park-stoun/06.jpg" alt="Квартира в ЖК Парк Стоун, фото 6" width="960" height="720" loading="lazy">
               <img src="img/park-stoun/07.jpg" alt="Квартира в ЖК Парк Стоун, фото 7" width="960" height="720" loading="lazy">
-              <img src="img/park-stoun/08.jpg" alt="Квартира в ЖК Парк Стоун, фото 8" width="960" height="720" loading="lazy">
-              <img src="img/park-stoun/09.jpg" alt="Квартира в ЖК Парк Стоун, фото 9" width="960" height="720" loading="lazy">
-              <img src="img/park-stoun/10.jpg" alt="Квартира в ЖК Парк Стоун, фото 10" width="960" height="720" loading="lazy">
-              <img src="img/park-stoun/11.jpg" alt="Квартира в ЖК Парк Стоун, фото 11" width="960" height="720" loading="lazy">
-              <img src="img/park-stoun/12.jpg" alt="Квартира в ЖК Парк Стоун, фото 12" width="960" height="720" loading="lazy">
-              <img src="img/park-stoun/13.jpg" alt="Квартира в ЖК Парк Стоун, фото 13" width="960" height="720" loading="lazy">
-              <img src="img/park-stoun/14.jpg" alt="Квартира в ЖК Парк Стоун, фото 14" width="960" height="720" loading="lazy">
-              <img src="img/park-stoun/15.jpg" alt="Квартира в ЖК Парк Стоун, фото 15" width="960" height="720" loading="lazy">
-              <img src="img/park-stoun/16.jpg" alt="Квартира в ЖК Парк Стоун, фото 16" width="960" height="720" loading="lazy">
-              <img src="img/park-stoun/17.jpg" alt="Квартира в ЖК Парк Стоун, фото 17" width="960" height="720" loading="lazy">
-              <img src="img/park-stoun/18.jpg" alt="Квартира в ЖК Парк Стоун, фото 18" width="960" height="720" loading="lazy">
-              <img src="img/park-stoun/19.jpg" alt="Квартира в ЖК Парк Стоун, фото 19" width="960" height="720" loading="lazy">
-              <img src="img/park-stoun/20.jpg" alt="Квартира в ЖК Парк Стоун, фото 20" width="960" height="720" loading="lazy">
-              <img src="img/park-stoun/21.jpg" alt="Квартира в ЖК Парк Стоун, фото 21" width="960" height="720" loading="lazy">
-              <img src="img/park-stoun/22.jpg" alt="Квартира в ЖК Парк Стоун, фото 22" width="960" height="720" loading="lazy">
-              <img src="img/park-stoun/23.jpg" alt="Квартира в ЖК Парк Стоун, фото 23" width="960" height="720" loading="lazy">
-              <img src="img/park-stoun/24.jpg" alt="Квартира в ЖК Парк Стоун, фото 24" width="960" height="720" loading="lazy">
             </div>
             <button class="slider__btn slider__btn--prev" type="button" aria-label="Попереднє фото"><svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
             <button class="slider__btn slider__btn--next" type="button" aria-label="Наступне фото"><svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
             <span class="slider__count" aria-live="polite"></span>
+            <span class="slider__progress" aria-hidden="true"></span>
             <span class="listing__badge">Продаж</span>
           </div>
           <div class="listing__body">
@@ -759,6 +752,54 @@
         cancelAnimationFrame(raf); raf = requestAnimationFrame(render);
       }, { passive: true });
       render();
+
+      // Автоперемикання: працює, лише коли картка на екрані; пауза, коли людина сама гортає
+      var DELAY = 3500, RESUME_AFTER = 8000;
+      var progress = root.querySelector('.slider__progress');
+      var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var timer = null, resumeT = null, inView = false, hovered = false, held = false;
+      var restartBar = function () {
+        if (!progress) return;
+        progress.classList.remove('is-running'); void progress.offsetWidth;
+        progress.style.animationDuration = DELAY + 'ms';
+        progress.classList.add('is-running');
+      };
+      var stopBar = function () { if (progress) progress.classList.remove('is-running'); };
+      var play = function () {
+        if (timer || held || reduce || !inView || hovered || document.hidden) return;
+        restartBar();
+        timer = setInterval(function () { go(base() + 1); restartBar(); }, DELAY);
+      };
+      var pause = function () { clearInterval(timer); timer = null; stopBar(); };
+      var hold = function () {
+        pause(); held = true; clearTimeout(resumeT);
+        resumeT = setTimeout(function () { held = false; play(); }, RESUME_AFTER);
+      };
+
+      ['pointerdown', 'touchstart', 'wheel', 'keydown', 'click'].forEach(function (ev) {
+        root.addEventListener(ev, hold, { passive: true });
+      });
+      // Наведення мишею (лише на десктопі; на телефоні дотик — це pointerdown вище)
+      root.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { hovered = true; pause(); } });
+      root.addEventListener('pointerleave', function (e) {
+        if (e.pointerType === 'mouse') { hovered = false; held = false; clearTimeout(resumeT); play(); }
+      });
+      document.addEventListener('visibilitychange', function () { document.hidden ? pause() : play(); });
+
+      if ('IntersectionObserver' in window) {
+        // Трохи заздалегідь довантажуємо всі фото, щоб під час показу не було порожніх кадрів
+        new IntersectionObserver(function (entries, obs) {
+          if (entries[0].isIntersecting) {
+            track.querySelectorAll('img[loading="lazy"]').forEach(function (img) { img.loading = 'eager'; });
+            obs.disconnect();
+          }
+        }, { rootMargin: '400px 0px' }).observe(root);
+
+        new IntersectionObserver(function (entries) {
+          inView = entries[0].isIntersecting;
+          inView ? play() : pause();
+        }, { threshold: 0.6 }).observe(root);
+      }
     });
 
     (function () {

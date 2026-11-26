@@ -148,6 +148,24 @@
       max-width: 30ch;
     }
 
+    /* ---------- Компанія ---------- */
+    .company {
+      display: inline-flex; align-items: center; gap: 8px;
+      min-height: 48px;
+      margin-top: 16px;
+      padding: 8px 16px 8px 18px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      text-decoration: none;
+      font-size: 14px;
+      transition: border-color .2s ease, transform .2s ease;
+    }
+    .company:hover { border-color: var(--brass-soft); transform: translateY(-1px); }
+    .company__label { color: var(--ink-soft); }
+    .company__name { font-weight: 700; letter-spacing: .12em; color: var(--green); }
+    .company svg { width: 14px; height: 14px; color: var(--brass); }
+
     /* ---------- Соцмережі ---------- */
     .socials {
       display: flex; justify-content: center; gap: 12px;
@@ -413,6 +431,9 @@
       <symbol id="i-house" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 10.5 12 3l9 7.5"/><path d="M5 9v11h14V9"/><path d="M10 20v-6h4v6"/>
       </symbol>
+      <symbol id="i-building" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/><path d="M16 9h2a2 2 0 0 1 2 2v10"/><path d="M3 21h18"/><path d="M8 7h4M8 11h4M8 15h4"/>
+      </symbol>
       <symbol id="i-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/>
       </symbol>
@@ -440,31 +461,29 @@
     <header class="hero">
       <div class="avatar">
         <div class="avatar__inner">
-          <!-- Плейсхолдер: монограма. Щойно поруч з index.html з'явиться файл photo.jpg (квадратний, від 400×400), він автоматично покриє монограму. -->
+          <!-- Фото: photo.jpg поруч з index.html (квадратне). Якщо файлу немає, показується монограма. -->
           <span class="avatar__initials" aria-hidden="true">ВБ</span>
-          <img src="photo.jpg" alt="Вікторія Боярчук" width="120" height="120" onerror="this.remove()">
+          <img src="photo.jpg" alt="Вікторія Боярчук" width="480" height="480" onerror="this.remove()">
         </div>
       </div>
 
       <p class="eyebrow">Ріелтор у Києві</p>
       <h1>Вікторія Боярчук</h1>
 
-      <!--
-        Варіанти слогану (замініть текст у <p class="tagline"> нижче):
-        1. «Спокійно і чесно — від першого перегляду до ключів»   ← зараз на сайті
-        2. «Допомагаю знайти дім, у якому хочеться жити»
-        3. «Нерухомість Києва з людським підходом»
-        TODO: оберіть фінальний слоган
-      -->
       <p class="tagline">Спокійно і чесно — від першого перегляду до ключів</p>
+
+      <a class="company" href="https://primes.rieltor.ua/" target="_blank" rel="noopener">
+        <span class="company__label">Спеціаліст з продажу квартир</span>
+        <span class="company__name">PRIMES</span>
+        <svg aria-hidden="true"><use href="#i-arrow"/></svg>
+      </a>
     </header>
 
     <!-- ============ 2. СОЦМЕРЕЖІ ============ -->
     <ul class="socials" aria-label="Соцмережі">
       <li><a href="https://www.instagram.com/victoria_panchenko02" target="_blank" rel="noopener" aria-label="Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a></li>
       <li><a href="https://www.tiktok.com/@_vvvvv_1_" target="_blank" rel="noopener" aria-label="TikTok"><svg aria-hidden="true"><use href="#i-tiktok"/></svg></a></li>
-      <!-- TODO: вставте посилання на профіль Threads замість # -->
-      <li><a href="#" aria-label="Threads"><svg aria-hidden="true"><use href="#i-threads"/></svg></a></li>
+      <li><a href="https://www.threads.com/@victoria_" target="_blank" rel="noopener" aria-label="Threads"><svg aria-hidden="true"><use href="#i-threads"/></svg></a></li>
     </ul>
 
     <!-- ============ 3. ГОЛОВНІ ДІЇ ============ -->
@@ -507,6 +526,16 @@
           </a>
         </li>
         <li>
+          <a class="link-card" href="https://primes.rieltor.ua/" target="_blank" rel="noopener">
+            <span class="link-card__icon"><svg aria-hidden="true"><use href="#i-building"/></svg></span>
+            <span class="link-card__text">
+              <span class="link-card__title">PRIMES</span>
+              <span class="link-card__desc">Компанія, у якій я працюю</span>
+            </span>
+            <svg class="link-card__arrow" aria-hidden="true"><use href="#i-arrow"/></svg>
+          </a>
+        </li>
+        <li>
           <a class="link-card" href="https://www.olx.ua/d/uk/obyavlenie/vidova-na-dnpro-2-km-kvartira-70m2-zhk-park-stoun-obolon-vul-volodimira-vasyuka-2-d-ID11DEby.html" target="_blank" rel="noopener">
             <span class="link-card__icon"><svg aria-hidden="true"><use href="#i-tag"/></svg></span>
             <span class="link-card__text">
@@ -537,8 +566,7 @@
           </a>
         </li>
         <li>
-          <!-- TODO: вставте посилання на профіль Threads замість # -->
-          <a class="link-card" href="#">
+          <a class="link-card" href="https://www.threads.com/@victoria_" target="_blank" rel="noopener">
             <span class="link-card__icon"><svg aria-hidden="true"><use href="#i-threads"/></svg></span>
             <span class="link-card__text">
               <span class="link-card__title">Threads</span>
